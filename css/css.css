@@ -1,27 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&family=Roboto+Slab:wght@300&family=Roboto:wght@300&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap%27');
-/*
-.nnav{
-    padding: 15px;
-    list-style-type: none;
-    margin: 5px;
-    padding: 5px;
-    overflow: hidden;
-}
 
-.nnav li{
-    float: left;
-    padding: 10px 25px;
-    margin: 5px  5px;
-}
-.nnav-item{
-    text-decoration: none;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    font-size: 24px;
-    color: black;
-    
-}*/
 
 .nnav {
   list-style-type: none;
@@ -160,3 +139,45 @@ li a:hover {
 .clickable:hover{
   cursor: pointer;
 }
+
+@media (min-width: 1200px){
+  .container {
+      max-width: 1140px;
+  }
+}
+@media (min-width: 992px){
+  .container {
+      max-width: 960px;
+  }
+}
+@media (min-width: 768px){
+  .container {
+    max-width: 820px;
+  }
+}
+
+#secnav{
+  width: 200px;
+  margin: 0 auto 30px auto;
+  vertical-align: middle;
+}
+
+#secnav div{
+  cursor: pointer;
+  float: left;
+  font-family: 'Roboto', sans-serif;
+  display: block;
+  color: black;
+  border-bottom: 1px solid black;
+  text-align: center;
+  font-size: 22px;
+  padding: 15px 20px;
+  text-decoration: none;
+  border: 1px solid white;
+}
+
+#secnav div:hover{
+  background-color: rgb(240, 240, 240);
+}
+
+
