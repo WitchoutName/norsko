@@ -217,55 +217,76 @@ let markerPath = [
     ["m 150.57358,660.00018 c 5.0516,0 5.89095,3.59574 5.57315,6.56195 -0.31779,2.96621 -5.57315,11.05644 -5.57315,11.05644 0,0 -4.8849,-7.83598 -5.39338,-11.05644 -0.50848,-3.22046 0.34178,-6.56195 5.39338,-6.56195 z", "matrix(0.06165618,0,0,0.06165618,147.53342,662.13705)"],
     ["m 150.55553,654.26103 c 6.69714,0 7.80991,4.76705 7.38859,8.6995 -0.42131,3.93244 -7.38859,14.65804 -7.38859,14.65804 0,0 -6.47615,-10.38853 -7.15026,-14.65804 -0.67412,-4.26952 0.45311,-8.6995 7.15026,-8.6995 z","matrix(0.0853586,0,0,0.0853586,146.3486,657.43929)"]
     ]
+let regionsLink = [];
+let placesLink = [];
+let citiesLink = [];
+let popVal = [2, 4, 10, 20, 40, 80, 160, 2000]
+let colVal = [70, 80, 110, 130, 150, 170, 190, 255]
 
+function init(){
+    document.getElementById("map").innerHTML = mapSource.map;
+    $("#map svg").css("width","100%");
+    $("#map svg").css("height","auto");
+    $("#map svg").attr("viewBox","0 0 619 734");
 
-
-$(function(){
-    let regionsLink = [];
-    let placesLink = [];
-    let citiesLink = [];
-    function init(){
-        document.getElementById("map").innerHTML = mapSource.map;
-        $("#map svg").css("width","100%");
-        $("#map svg").css("height","auto");
-        $("#map svg").attr("viewBox","0 0 619 734");
-
-        for(let path of $("#map path")){
-            let reg = populations.find(region => {return region.region == $(path).attr("name")});
-            if(reg != null){
-                regionsLink.push([path, reg]);
-            }
-        }
-
-        for(let marker of $("#map g")){
-            let place = places.find(mem => {return mem.id == $(marker).attr("id")});
-            if(place != null){
-                placesLink.push([marker, place]);
-            }
-        }
-        for(let marker of $("#map g")){
-            let city = cities.find(mem => {return mem.id == $(marker).attr("id")});
-            if(city != null){
-                placesLink.push([marker, city]);
-            }
+    for(let path of $("#map path")){
+        let reg = populations.find(region => {return region.region == $(path).attr("name")});
+        if(reg != null){
+            regionsLink.push([path, reg]);
         }
     }
 
+    for(let marker of $("#map g")){
+        let place = places.find(mem => {return mem.id == $(marker).attr("id")});
+        if(place != null){
+            placesLink.push([marker, place]);
+            placesLink[placesLink.length-1].onMarker = false
+        }
+    }
+    for(let marker of $("#map g")){
+        let city = cities.find(mem => {return mem.name == $(marker).attr("id")});
+        if(city != null){
+            placesLink.push([marker, city]);
+        }
+    }
+}
+
+function popToCol(color){
+    for(let i = 0; i < popVal.length; i++){
+        if(color < popVal[i])
+        return colVal[i]
+    }
+    return null;
+}
+
+function animate(target, attr, value){
+    if(attr == "d"){
+        anime({
+            targets: target,
+            d: [{ value: value},],
+            easing: 'easeOutElastic',
+            duration: 100,
+            loop: false
+        });
+    }
+    if(attr == "transform"){
+        anime({
+            targets: target,
+            transform: [{ value: value},],
+            easing: 'easeOutElastic',
+            duration: 100,
+            loop: false
+        });
+    }
+}
+
+$(function(){
     let buttons = Array.from(document.getElementById("secnav").children)
     $(buttons[0]).on("click", function(){
         init()
-        let popVal = [2, 4, 10, 20, 40, 80, 160, 2000]
-        let colVal = [70, 80, 110, 130, 150, 170, 190, 255]
+
         let box = Array.from($("#map rect")).find(mem => {return $(mem).attr("id") == "textBg"});
         let text = Array.from($("#map text")).find(mem => {return $(mem).attr("id") == "textText"});
-        
-        function popToCol(color){
-            for(let i = 0; i < popVal.length; i++){
-                if(color < popVal[i])
-                return colVal[i]
-            }
-            return null;
-        }
 
         for(let i = 0; i < colVal.length; i++){
             $(Array.from($("#map rect"))[i+2]).css("fill", `rgb(0, ${colVal[i]}, 0)`)
@@ -289,9 +310,18 @@ $(function(){
             })
         }
             
-        for(let marker of placesLink.join(citiesLink)){
-            $(marker[0]).on("mouseover", function(){
-                console.log($(marker[1]).attr("name"))
+        function fuf()
+
+        for(let marker of placesLink.concat(citiesLink)){
+            $($(marker[0].children)).on("mouseover", function(){
+                console.log($(this))
+                animate("#"+$(marker[0].children[0]).attr("id"), "d", markerPath[1][0]);
+                animate("#"+$(marker[0].children[1]).attr("id"), "transform", markerPath[1][1]);
+            })
+            $(marker[0]).on("mouseout", function(){
+                console.log("out: ",this);
+                animate("#"+$(marker[0].children[0]).attr("id"), "d", markerPath[0][0]);
+                animate("#"+$(marker[0].children[1]).attr("id"), "transform", markerPath[0][1]);
             })
         }
 
