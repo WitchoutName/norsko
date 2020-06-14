@@ -20,7 +20,7 @@ let places = [
         "id":"spaboat"
     },
     {
-        "name":"Hike Pulpit Rock",
+        "name":"Hike Pulpid Rock",
         "description":"You’re almost guaranteed one of the best views of Norway from the top of Pulpit Rock. I mean, it ’s one of the best places in Norway – especially with the vistas you’ll see across the fjord. Now, the hike itself (return) took around 4-5 hours but it really depends on how fast and fit you are.",
         "id":"pulpid"
     },
@@ -214,21 +214,150 @@ let populations = [
     }
 ]
 let markerPath = [
+    [
     ["m 150.57358,660.00018 c 5.0516,0 5.89095,3.59574 5.57315,6.56195 -0.31779,2.96621 -5.57315,11.05644 -5.57315,11.05644 0,0 -4.8849,-7.83598 -5.39338,-11.05644 -0.50848,-3.22046 0.34178,-6.56195 5.39338,-6.56195 z", "matrix(0.06165618,0,0,0.06165618,147.53342,662.13705)"],
     ["m 150.55553,654.26103 c 6.69714,0 7.80991,4.76705 7.38859,8.6995 -0.42131,3.93244 -7.38859,14.65804 -7.38859,14.65804 0,0 -6.47615,-10.38853 -7.15026,-14.65804 -0.67412,-4.26952 0.45311,-8.6995 7.15026,-8.6995 z","matrix(0.0853586,0,0,0.0853586,146.3486,657.43929)"]
-    ]
+    ],
+    [
+    ["m 187.00849,660.24769 c 5.0516,0 5.89095,3.59574 5.57315,6.56195 -0.31779,2.96621 -5.57315,11.05644 -5.57315,11.05644 0,0 -4.8849,-7.83598 -5.39338,-11.05644 -0.50848,-3.22046 0.34178,-6.56195 5.39338,-6.56195 z", "matrix(0.01881513,0,0,0.01881513,182.27295,662.47941)"],
+    ["m 186.99109,654.71435 c 6.63812,0 7.74108,4.72505 7.32348,8.62283 -0.41759,3.89782 -7.32348,14.5289 -7.32348,14.5289 0,0 -6.41909,-10.29699 -7.08725,-14.5289 -0.66819,-4.23188 0.44912,-8.62283 7.08725,-8.62283 z","matrix(0.025425,0,0,0.025425,180.58082,657.23581)"]
+    ],
+]
+let thisTab = document.getElementsByClassName("tab")[Array.from(document.getElementsByClassName("nnav-item")).indexOf(Array.from(document.getElementsByClassName("nnav-item")).find(mem => {return mem.innerText == "Geografie"}))]
+let popVal = [2, 4, 10, 20, 40, 80, 160, 2000]
+let colVal = [70, 80, 110, 130, 150, 170, 190, 255]
 let regionsLink = [];
 let placesLink = [];
 let citiesLink = [];
-let popVal = [2, 4, 10, 20, 40, 80, 160, 2000]
-let colVal = [70, 80, 110, 130, 150, 170, 190, 255]
+let game;
+let box;
+let text;
+
+class Round{
+    constructor(possibleQuestions, allQuestions){
+        this.type;
+        this.answer;
+        this.possibilities = [null, null, null, null];
+        
+        let rightAnswer = possibleQuestions[Math.floor(Math.random() * possibleQuestions.length)];
+        this.answer = rightAnswer;
+        this.possibilities[Math.floor(Math.random() * 4)] = rightAnswer;
+        possibleQuestions.splice(possibleQuestions.indexOf(rightAnswer), 1);
+        allQuestions.splice(allQuestions.indexOf(rightAnswer), 1);
+        for(let i = 0; i < 4; i++){
+            if(this.possibilities[i] == null){
+                let randomQues = allQuestions[Math.floor(Math.random() * allQuestions.length)];
+                this.possibilities[i] = randomQues;
+                allQuestions.splice(allQuestions.indexOf(randomQues), 1);
+            }
+        }
+
+        if(regionsLink.includes(this.answer))
+            this.type = 0
+        else if(citiesLink.includes(this.answer))
+            this.type = 1
+        else if(placesLink.includes(this.answer))
+            this.type = 2
+    }
+}
+
+class Game{
+    constructor(gameLength, output, options){
+        this.output = output;
+        this.correctAnswers = 0;
+        this.currRound = 0;
+        this.options = [];
+        this.rounds = [];
+        this.isOkToCkick = true;
+
+        if(options[0])
+            this.options.push(Array.from(regionsLink))
+        if(options[1])
+            this.options.push(Array.from(citiesLink))
+        if(options[2])
+            this.options.push(Array.from(placesLink))
+
+        this.initGame(gameLength)
+    }
+    initGame(num){
+        for(let i = 0; i < num; i++){
+            let index = Math.floor(Math.random() * this.options.length);
+            let randomArr = this.options[index];
+            this.rounds.push(new Round(randomArr, Array.from(randomArr)));
+        }
+
+        for(let i = 0; i < 4; i++){
+            this.output[i].addEventListener("click", function(){
+                if(game.isOkToCkick){
+                    let indexOfRight = game.rounds[game.currRound].possibilities.indexOf(game.rounds[game.currRound].answer);
+                    game.isOkToCkick = false;
+                    game.showRoundRes(indexOfRight, i);
+                }
+            })
+        }
+        this.loadRound()
+    }
+    loadRound(){
+        for(let i = 0; i < 4; i++){
+            let currOut = this.output[i]
+            let currPosipka = this.rounds[this.currRound];
+            this.output[0].parentElement.parentElement.children[0].innerText = (this.currRound+1)+"/"+(this.rounds.length)
+            if(currPosipka.type == 0){
+                currOut.innerText = currPosipka.possibilities[i][1].region
+                currPosipka.possibilities[currPosipka.possibilities.indexOf(currPosipka.answer)][0].style.fill = "red";
+            }    
+            if(currPosipka.type == 1){
+                currOut.innerText = currPosipka.possibilities[i][1].name
+                $(currPosipka.possibilities[currPosipka.possibilities.indexOf(currPosipka.answer)][0]).show()
+            }    
+            if(currPosipka.type == 2){
+                currOut.innerText = currPosipka.possibilities[i][1].name
+                $(currPosipka.possibilities[currPosipka.possibilities.indexOf(currPosipka.answer)][0]).show()
+            }    
+        }
+    }
+    showRoundRes(indexOfRight, indexOfClicked){
+        let wasRight;
+        $(this.output[indexOfRight]).toggleClass("quiz-right");
+        if(indexOfRight != this.output.indexOf(this.output[indexOfClicked])){
+            $(this.output[indexOfClicked]).toggleClass("quiz-wrong");
+            wasRight = false;
+        }
+        else{
+            this.correctAnswers += 1;
+            wasRight = true;
+        }
+
+        setTimeout(function(){
+            $(game.output[indexOfRight]).toggleClass("quiz-right");
+            if(!wasRight)
+                $(game.output[indexOfClicked]).toggleClass("quiz-wrong");
+            
+            for(let region of regionsLink){region[0].style.fill = "#4d4d4d";}
+            for(let marker of placesLink.concat(citiesLink)){$(marker[0]).hide();}
+               
+
+            if(game.currRound < game.rounds.length -1){
+                game.currRound += 1;
+                game.isOkToCkick = true;
+                game.loadRound()
+            }
+            else{
+                document.getElementById("answers").innerHTML = "<h2 style='float:left;'>Result: "+game.correctAnswers+"/"+game.rounds.length+"</h2>"
+            }
+        }, 2000);
+    }
+}
 
 function init(){
     document.getElementById("map").innerHTML = mapSource.map;
     $("#map svg").css("width","100%");
     $("#map svg").css("height","auto");
     $("#map svg").attr("viewBox","0 0 619 734");
+    box = Array.from($("#map rect")).find(mem => {return $(mem).attr("id") == "textBg"});
+    text = Array.from($("#map text")).find(mem => {return $(mem).attr("id") == "textText"});
 
+    regionsLink = [];
     for(let path of $("#map path")){
         let reg = populations.find(region => {return region.region == $(path).attr("name")});
         if(reg != null){
@@ -236,18 +365,45 @@ function init(){
         }
     }
 
+    placesLink = [];
     for(let marker of $("#map g")){
         let place = places.find(mem => {return mem.id == $(marker).attr("id")});
         if(place != null){
             placesLink.push([marker, place]);
-            placesLink[placesLink.length-1].onMarker = false
+            initMarker(placesLink[placesLink.length-1], marker)
         }
     }
+
+    citiesLink = [];
     for(let marker of $("#map g")){
         let city = cities.find(mem => {return mem.name == $(marker).attr("id")});
         if(city != null){
-            placesLink.push([marker, city]);
+            citiesLink.push([marker, city]);
+            initMarker(citiesLink[citiesLink.length-1], marker)
         }
+    }
+}
+
+function initMarker(currMarker, marker){
+    currMarker.onMarker = false;   
+    currMarker.onMarkerIcon = false;
+    currMarker.isClicked = false;
+    currMarker.tippy = tippy(Array.from($("#map g")).find(mem => {return $(marker).attr("id") == $(mem).attr("id")}) , {
+        content: "",
+        allowHTML: true,
+        hideOnClick: false,
+        trigger: "",
+        maxWidth: 500,
+        theme: 'light-border',
+    })
+    currMarker.close = function(){
+        if(placesLink.includes(currMarker)){
+            animOut(currMarker, 1);
+        }
+        else if(citiesLink.includes(currMarker)){
+            animOut(currMarker, 0);
+        }
+        currMarker.tippy.hide()
     }
 }
 
@@ -264,7 +420,7 @@ function animate(target, attr, value){
         anime({
             targets: target,
             d: [{ value: value},],
-            easing: 'easeOutElastic',
+            easing: 'easeOutExpo',
             duration: 100,
             loop: false
         });
@@ -273,27 +429,44 @@ function animate(target, attr, value){
         anime({
             targets: target,
             transform: [{ value: value},],
-            easing: 'easeOutElastic',
+            easing: 'easeOutExpo',
             duration: 100,
             loop: false
         });
     }
 }
 
-$(function(){
-    let buttons = Array.from(document.getElementById("secnav").children)
-    $(buttons[0]).on("click", function(){
-        init()
+function animIn(marker, markerType){
+    animate("#"+$(marker[0].children[0]).attr("id"), "d", markerPath[markerType][1][0]);
+    animate("#"+$(marker[0].children[1]).attr("id"), "transform", markerPath[markerType][1][1]);    
+}
 
-        let box = Array.from($("#map rect")).find(mem => {return $(mem).attr("id") == "textBg"});
-        let text = Array.from($("#map text")).find(mem => {return $(mem).attr("id") == "textText"});
+function animOut(marker, markerType){
+    animate("#"+$(marker[0].children[0]).attr("id"), "d", markerPath[markerType][0][0]);
+    animate("#"+$(marker[0].children[1]).attr("id"), "transform", markerPath[markerType][0][1]);
+}
+
+function setOnMarker(marker, item, value){
+    if($(item).attr("id") == $(marker[0].children[0]).attr("id"))
+        marker.onMarker = value;
+    if($(item).attr("id") == $(marker[0].children[1]).attr("id"))
+        marker.onMarkerIcon = value;
+}
+
+$(function(){
+    let buttons = Array.from(document.getElementById("secnav").children);
+    $("#answers").hide();
+    $("#thirnav").hide();
+    $(buttons[0]).on("click", function(){
+        $("#answers").hide();
+        $("#thirnav").hide();
+        init()
 
         for(let i = 0; i < colVal.length; i++){
             $(Array.from($("#map rect"))[i+2]).css("fill", `rgb(0, ${colVal[i]}, 0)`)
         }
 
         for(let region of regionsLink){
-            console.log(region)
             let greenValue = popToCol($(region[1]).attr("population"));
             let color = `rgb(0, ${greenValue}, 0)`;
             $(region[0]).css("fill", color);
@@ -310,27 +483,80 @@ $(function(){
             })
         }
             
-        function fuf()
-
         for(let marker of placesLink.concat(citiesLink)){
-            $($(marker[0].children)).on("mouseover", function(){
-                console.log($(this))
-                animate("#"+$(marker[0].children[0]).attr("id"), "d", markerPath[1][0]);
-                animate("#"+$(marker[0].children[1]).attr("id"), "transform", markerPath[1][1]);
+            $(marker[0].children).on("mouseover", function(){
+                setOnMarker(marker, this, true);
+
+                if(placesLink.includes(marker))
+                    animIn(marker, 1);
+                else if(citiesLink.includes(marker))
+                    animIn(marker, 0);
+                
+                if(!marker.isClicked){
+                    marker.tippy.setContent(marker[1].name)
+                    marker.tippy.setProps({placement: "top"})
+                    marker.tippy.show()
+                }
             })
-            $(marker[0]).on("mouseout", function(){
-                console.log("out: ",this);
-                animate("#"+$(marker[0].children[0]).attr("id"), "d", markerPath[0][0]);
-                animate("#"+$(marker[0].children[1]).attr("id"), "transform", markerPath[0][1]);
+            $(marker[0].children).on("mouseout", function(){
+                setOnMarker(marker, this, false);
+                
+                setTimeout(function(){
+                    if(!marker.onMarker && !marker.onMarkerIcon && !marker.isClicked){
+                        marker.close()
+                    }
+                }, 25)
+            })
+            $(marker[0].children).on("click", function(){
+                for(let mm of placesLink.concat(citiesLink)){  
+                    if(mm[1].name != marker[1].name){
+                        mm.close();    
+                        mm.isClicked = false;
+                    }
+                    else{
+                        mm.isClicked = true;
+                    }
+                        
+                }
+                marker.tippy.hide()
+                marker.tippy.setProps({placement: "right"})
+                let newContent = "<h2>"+marker[1].name+"</h2><hr><p>"+marker[1].description+"</p><img src='img/geografie/"+marker[1].id+".jpg' style='width: 100%; height: 100%;'></img>"
+                marker.tippy.setContent(newContent)
+                marker.tippy.show()
             })
         }
 
-    })
-
+        document.body.addEventListener("click", function(){
+            for(let marker of placesLink.concat(citiesLink)){
+                if(!marker.onMarker && !marker.onMarkerIcon)
+                    marker.close();
+            }
+        })
+    }) 
     $(buttons[1]).on("click", function(){
+        for(let marker of placesLink.concat(citiesLink)){ marker.tippy.destroy();}
+        $("#thirnav").show();
         init()
-    })
-    
-    
+        for(let marker of placesLink.concat(citiesLink)){$(marker[0]).hide()}
+        $(box).hide();
+        $(text).hide();
+        $("#popChart").hide();
+        $("svg").hide();
+        $("#start").on("click", function(){
+            let input = [];
+            for(let checkbox of $("#thirnav input")){ input.push($(checkbox).prop("checked"))}
+            if(!input.every(mem =>{return mem == false})){
+                for(let region of regionsLink){region[0].style.fill = "#4d4d4d";}
+                for(let marker of placesLink.concat(citiesLink)){$(marker[0]).hide()}
+                document.getElementById("answers").innerHTML = "<div>10/10</div><ul><li>ans1er 1</li><li>ans1er 2</li><li>ans1er 3</li><li>ans1er 4</li></ul>"
+                $("svg").show();
+                $("#answers").show();
+                game = new Game(10, Array.from(document.getElementById("answers").children[1].children) ,input);
+            }
+        })
 
+        
+        
+    })
+      
 })

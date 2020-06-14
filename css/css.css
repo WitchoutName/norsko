@@ -140,6 +140,7 @@ li a:hover {
   cursor: pointer;
 }
 
+
 @media (min-width: 1200px){
   .container {
       max-width: 1140px;
@@ -157,14 +158,15 @@ li a:hover {
 }
 
 #secnav{
-  width: 200px;
+  width: 181px;
+  max-width: 181px;
   margin: 0 auto 30px auto;
   vertical-align: middle;
 }
 
 #secnav div{
   cursor: pointer;
-  float: left;
+  float: left;  
   font-family: 'Roboto', sans-serif;
   display: block;
   color: black;
@@ -180,4 +182,88 @@ li a:hover {
   background-color: rgb(240, 240, 240);
 }
 
+#thirnav{
+  width: 400px;
+  margin: 0 auto 30px auto;
+  vertical-align: middle;
+}
 
+#thirnav div{
+  left: 45px;
+  position: relative;
+  cursor: pointer;
+  float: left;  
+  font-family: 'Roboto', sans-serif;
+  display: block;
+  color: black;
+  border-bottom: 1px solid black;
+  text-align: center;
+  font-size: 22px;
+  padding: 10px 10px;
+  text-decoration: none;
+  border: 1px solid white;
+ 
+}
+
+#thirnav div:last-child{
+ border: 1px solid black;
+padding: 5px 130px;
+}
+
+#start{
+  
+}
+
+g:focus{
+  outline: 0;
+}
+
+#geo-back div{
+  background-color: white;
+}
+
+#answers{
+  font-family: 'Roboto', sans-serif;
+  font-size: 17px;
+  position: relative;
+  float: right;
+  top: -250px;
+  right: 50px;
+}
+
+#answers ul{
+  background-color: rgb(240, 240, 240);
+  text-align: left;
+  width: 400px;
+  list-style-type: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+#answers ul li{
+  padding: 10px 10px;
+  border: 1px solid rgb(124, 124, 124);
+  border-bottom: 0;
+  
+}
+/*
+#answers ul li:hover{
+  background-color: rgb(207, 207, 207); 
+}
+*/
+#answers ul li:last-child{
+  border-bottom:1px solid rgb(124, 124, 124);
+}
+
+.quiz-right{
+  background-color: rgb(121, 255, 121);
+}
+.quiz-wrong{
+  background-color: rgb(255, 121, 121);
+}
+.quiz-right:hover{
+  background-color: rgb(121, 255, 121);
+}
+.quiz-wrong:hover{
+  background-color: rgb(255, 121, 121);
+}
