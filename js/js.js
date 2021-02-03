@@ -17,7 +17,7 @@ for (let button of nav_buttons){
 	button.active = true;
     button.style = nav_buttons_styles.active;
   })
-  let cur_button;
+  let cur_button = nav_buttons[2];
   button.addEventListener("mouseenter", ()=>{
   	if(nav_buttons.lastIndexOf(button) > 0){  
   		cur_button = nav_buttons[nav_buttons.lastIndexOf(button) - 1]
